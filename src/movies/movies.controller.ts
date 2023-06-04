@@ -1,4 +1,13 @@
-import { Controller, Delete, Get, Param, Post, Patch } from '@nestjs/common';
+import {
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Post,
+  Patch,
+  Body,
+  Query,
+} from '@nestjs/common';
 
 @Controller('movies')
 export class MoviesController {
@@ -7,14 +16,19 @@ export class MoviesController {
     return 'This will return all moives';
   }
 
+  @Get('search')
+  search(@Query('year') seachingYear: string) {
+    return `We are searching for a movie made after: ${seachingYear}`;
+  }
+
   @Get('/:id')
-  getOne(@Param('id') id: string) {
-    return `This will return one movie with the id: ${id}`;
+  getOne(@Param('id') movieId: string) {
+    return `This will return one movie with the id: ${movieId}`;
   }
 
   @Post()
-  create() {
-    return 'This will create a movie';
+  create(@Body() movieData) {
+    return movieData;
   }
 
   @Delete('/:id')
@@ -23,7 +37,10 @@ export class MoviesController {
   }
 
   @Patch('/:id')
-  path(@Param('id') movieId: string) {
-    return `This will patch a movie with the id: ${movieId}`;
+  path(@Param('id') movieId: string, @Body() updateData) {
+    return {
+      updateMovie: movieId,
+      ...updateData,
+    };
   }
 }
