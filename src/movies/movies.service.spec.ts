@@ -87,4 +87,26 @@ describe('MoviesService', () => {
       expect(afterCreate).toBeGreaterThan(beforeCreate); // 생성 후 데이터 길이 확인
     });
   });
+
+  describe('update', () => {
+    it('should update a movie', () => {
+      // 매번 테스트를 위해 데이터를 작성하지 않고 beforeEach에서 데이터를 넣도록 작성할 수도 있음
+      service.create({
+        title: 'Test Movie',
+        genres: ['test'],
+        year: 2000,
+      });
+      service.update(1, { title: 'Updated Test' }); // id가 1인 데이터의 title을 변경
+      const movie = service.getOne(1);
+      expect(movie.title).toEqual('Updated Test'); // 변경된 title 확인
+    });
+
+    it('should throw a NotFoundException', () => {
+      try {
+        service.update(999, {}); // id가 999인 데이터를 업데이트
+      } catch (e) {
+        expect(e).toBeInstanceOf(NotFoundException); // 예외처리
+      }
+    });
+  });
 });
