@@ -1,17 +1,24 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { INestApplication } from '@nestjs/common';
+import { INestApplication, ValidationPipe } from '@nestjs/common';
 import * as request from 'supertest';
-import { AppModule } from './../src/app.module';
+import { AppModule } from '../src/app.module';
 
 describe('AppController (e2e)', () => {
   let app: INestApplication;
 
-  beforeEach(async () => {
+  beforeAll(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
       imports: [AppModule],
     }).compile();
 
     app = moduleFixture.createNestApplication();
+    app.useGlobalPipes(
+      new ValidationPipe({
+        whitelist: true, // 이상한 데이터 요청 거름
+        forbidNonWhitelisted: true, // 이상한 요소에 대한 메세지 반환
+        transform: true, // 타입 변경해 줌(디폴트로 string인데 우리가 설정한 number로 변경)
+      }),
+    );
     await app.init();
   });
 
@@ -42,5 +49,17 @@ describe('AppController (e2e)', () => {
     it('DELETE', () => {
       return request(app.getHttpServer()).delete('/movies').expect(404);
     });
+  });
+
+  describe('/movies/:id', () => {
+    // it.todo('GET'); : todo 를 작성할 수 있음
+    it('GET 200', () => {
+      return request(app.getHttpServer()).get('/movies/1').expect(200);
+    });
+    it('GET 404', () => {
+      return request(app.getHttpServer()).get('/movies/999').expect(404);
+    });
+    it.todo('DELETE');
+    it.todo('PATCH');
   });
 });
